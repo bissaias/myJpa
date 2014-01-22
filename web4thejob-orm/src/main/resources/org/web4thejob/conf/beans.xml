@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <aop:aspectj-autoproxy/>
+    <context:annotation-config/>
+    <context:component-scan base-package="org.web4thejob"/>
+
+    <bean id="dataSource1" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="org.h2.Driver"/>
+        <property name="url" value="jdbc:h2:mem:test1;DB_CLOSE_DELAY=-1"/>
+        <property name="username" value="sa"/>
+        <property name="password" value="sa"/>
+    </bean>
+
+    <bean id="dataSource2" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="org.h2.Driver"/>
+        <property name="url" value="jdbc:h2:mem:test2;DB_CLOSE_DELAY=-1"/>
+        <property name="username" value="sa"/>
+        <property name="password" value="sa"/>
+    </bean>
+
+    <bean id="pum" class="org.springframework.orm.jpa.persistenceunit.DefaultPersistenceUnitManager">
+        <property name="persistenceXmlLocations">
+            <list>
+                <value>classpath*:META-INF/persistence.xml</value>
+            </list>
+        </property>
+
+        <property name="dataSources">
+            <map>
+                <entry key="joblet1_DS" value-ref="dataSource1"/>
+                <entry key="joblet2_DS" value-ref="dataSource2"/>
+            </map>
+        </property>
+
+        <!-- if no datasource is specified, use this one -->
+        <!--<property name="defaultDataSource" ref="dataSource"/>-->
+    </bean>
+
+    <bean id="hibernateAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+        <property name="showSql" value="true"/>
+    </bean>
+
+    <bean id="myEmf1" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="persistenceUnitManager" ref="pum"/>
+        <property name="persistenceUnitName" value="Joblet1"/>
+        <property name="jpaVendorAdapter" ref="hibernateAdapter"/>
+    </bean>
+    <bean id="myEmf2" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="persistenceUnitManager" ref="pum"/>
+        <property name="persistenceUnitName" value="Joblet2"/>
+        <property name="jpaVendorAdapter" ref="hibernateAdapter"/>
+    </bean>
+
+
+    <bean id="transactionManager1" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="persistenceUnitName" value="Joblet1"/>
+    </bean>
+
+    <bean id="transactionManager2" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="persistenceUnitName" value="Joblet2"/>
+    </bean>
+
+    <!--
+        <bean class="org.springframework.transaction.support.TransactionTemplate">
+            <property name="transactionManager" ref="transactionManager1"/>
+        </bean>
+    -->
+</beans>
+
