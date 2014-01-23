@@ -11,6 +11,7 @@
         <module>joblet1</module>
         <module>joblet2</module>
         <module>web4thejob-orm</module>
+        <module>web4thejob-core</module>
     </modules>
     <packaging>pom</packaging>
 

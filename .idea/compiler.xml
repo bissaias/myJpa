@@ -29,12 +29,14 @@
         <module name="jiblet1" />
         <module name="joblet1" />
         <module name="joblet2" />
+        <module name="web4thejob-core" />
         <module name="web4thejob-orm" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="joblet1" target="1.7" />
       <module name="joblet2" target="1.7" />
+      <module name="web4thejob-core" target="1.7" />
       <module name="web4thejob-orm" target="1.7" />
     </bytecodeTargetLevel>
   </component>

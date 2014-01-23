@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/joblet1/joblet1.iml" filepath="$PROJECT_DIR$/joblet1/joblet1.iml" />
       <module fileurl="file://$PROJECT_DIR$/joblet2/joblet2.iml" filepath="$PROJECT_DIR$/joblet2/joblet2.iml" />
       <module fileurl="file://$PROJECT_DIR$/myJpa.iml" filepath="$PROJECT_DIR$/myJpa.iml" />
+      <module fileurl="file://$PROJECT_DIR$/web4thejob-core/web4thejob-core.iml" filepath="$PROJECT_DIR$/web4thejob-core/web4thejob-core.iml" />
       <module fileurl="file://$PROJECT_DIR$/web4thejob-orm/web4thejob-orm.iml" filepath="$PROJECT_DIR$/web4thejob-orm/web4thejob-orm.iml" />
     </modules>
   </component>

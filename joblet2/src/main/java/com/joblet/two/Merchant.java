@@ -5,7 +5,7 @@ import javax.persistence.*;
 
 @Entity
 //@Table(schema = "job2")
-public class Merchant {
+public class Merchant implements org.web4thejob.orm.Entity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

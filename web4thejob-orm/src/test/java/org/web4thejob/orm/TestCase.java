@@ -5,23 +5,14 @@ import com.joblet.two.Merchant;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.orm.jpa.EntityManagerFactoryUtils;
-import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceContext;
-import java.util.Map;
 
 /**
  * @author Veniamin Isaias
@@ -72,64 +63,34 @@ public class TestCase {
 
     @Test
     public void test3() {
-        final PlatformTransactionManager tm1 = getJpaTransactionManager("Joblet1");
-        Assert.assertNotNull(tm1);
-
-        TransactionTemplate template1 = new TransactionTemplate(tm1); //  applicationContext.getBean(TransactionTemplate.class);
-        template1.execute(new TransactionCallbackWithoutResult() {
-            @Override
-            protected void doInTransactionWithoutResult(TransactionStatus status) {
-                final EntityManager em = getEntityManager("Joblet1");
-                Assert.assertNotNull(em);
-                final Customer c = new Customer("first", "last");
-                Assert.assertTrue(c.getId() == 0);
-
-                em.persist(c);
-
-                Assert.assertTrue(c.getId() > 0);
-            }
-        });
-
-        final PlatformTransactionManager tm2 = getJpaTransactionManager("Joblet2");
-        Assert.assertNotNull(tm2);
-
-        TransactionTemplate template2 = new TransactionTemplate(tm2); //  applicationContext.getBean(TransactionTemplate.class);
-        template2.execute(new TransactionCallbackWithoutResult() {
-            @Override
-            protected void doInTransactionWithoutResult(TransactionStatus status) {
-                final EntityManager em = getEntityManager("Joblet2");
-                Assert.assertNotNull(em);
-                Merchant m = new Merchant("first", "last");
-
-                Assert.assertTrue(m.getId() == 0);
-
-                em.persist(m);
-
-                Assert.assertTrue(m.getId() > 0);
-            }
-        });
-
-    }
+        DataWiterService dataWiterService = applicationContext.getBean(DataWiterService.class);
 
 
-    public PlatformTransactionManager getJpaTransactionManager(String unitName) {
+        for (int i = 1; i <= 100; i++) {
+            final Customer c = new Customer("first", "last");
+            Assert.assertTrue(c.getId() == 0);
+            dataWiterService.persist(c);
+            Assert.assertTrue(c.getId() > 0);
 
-        for (Map.Entry<String, JpaTransactionManager> entry :
-                BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext,
-                        JpaTransactionManager.class).entrySet()) {
-
-            if (entry.getValue().getPersistenceUnitName().equals(unitName)) {
-                return entry.getValue();
-            }
+            final Merchant m = new Merchant("first", "last");
+            Assert.assertTrue(m.getId() == 0);
+            dataWiterService.persist(m);
+            Assert.assertTrue(m.getId() > 0);
         }
 
-        return null;
+        for (int i = 1; i <= 100; i++) {
+            final Merchant m = new Merchant("first", "last");
+            Assert.assertTrue(m.getId() == 0);
+            dataWiterService.persist(m);
+            Assert.assertTrue(m.getId() > 0);
+
+            final Customer c = new Customer("first", "last");
+            Assert.assertTrue(c.getId() == 0);
+            dataWiterService.persist(c);
+            Assert.assertTrue(c.getId() > 0);
+        }
+
     }
 
-    public EntityManager getEntityManager(String unitName) {
-
-        EntityManagerFactory emf = EntityManagerFactoryUtils.findEntityManagerFactory(applicationContext, unitName);
-        return EntityManagerFactoryUtils.getTransactionalEntityManager(emf);
-    }
 
 }
