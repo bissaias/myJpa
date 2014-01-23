@@ -26,25 +26,25 @@
         <property name="password" value="sa"/>
     </bean>
 
-<!--
-    <bean id="pum" class="org.springframework.orm.jpa.persistenceunit.DefaultPersistenceUnitManager">
-        <property name="persistenceXmlLocations">
-            <list>
-                <value>classpath*:META-INF/persistence.xml</value>
-            </list>
-        </property>
+    <!--
+        <bean id="pum" class="org.springframework.orm.jpa.persistenceunit.DefaultPersistenceUnitManager">
+            <property name="persistenceXmlLocations">
+                <list>
+                    <value>classpath*:META-INF/persistence.xml</value>
+                </list>
+            </property>
 
-        <property name="dataSources">
-            <map>
-                &lt;!&ndash;<entry key="joblet1_DS" value-ref="dataSource1"/>&ndash;&gt;
-                <entry key="joblet2_DS" value-ref="dataSource2"/>
-            </map>
-        </property>
+            <property name="dataSources">
+                <map>
+                    &lt;!&ndash;<entry key="joblet1_DS" value-ref="dataSource1"/>&ndash;&gt;
+                    <entry key="joblet2_DS" value-ref="dataSource2"/>
+                </map>
+            </property>
 
-        &lt;!&ndash; if no datasource is specified, use this one &ndash;&gt;
-        &lt;!&ndash;<property name="defaultDataSource" ref="dataSource"/>&ndash;&gt;
-    </bean>
--->
+            &lt;!&ndash; if no datasource is specified, use this one &ndash;&gt;
+            &lt;!&ndash;<property name="defaultDataSource" ref="dataSource"/>&ndash;&gt;
+        </bean>
+    -->
 
     <bean id="hibernateAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
         <property name="showSql" value="true"/>
