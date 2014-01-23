@@ -1,7 +1,5 @@
 package org.web4thejob.orm;
 
-import org.springframework.stereotype.Repository;
-
 /**
  * @author Veniamin Isaias
  * @since 1.0.0
@@ -9,5 +7,9 @@ import org.springframework.stereotype.Repository;
 
 public interface DataWiterService {
 
-    void persist(Entity entity);
+    <E extends Entity> E persist(final E entity);
+
+    public <E extends Entity> E find(Class<E> entityClass, Object primaryKey);
+
+    void remove(Entity entity);
 }

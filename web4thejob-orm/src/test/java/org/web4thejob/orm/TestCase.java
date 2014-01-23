@@ -67,30 +67,53 @@ public class TestCase {
 
 
         for (int i = 1; i <= 100; i++) {
-            final Customer c = new Customer("first", "last");
+            Customer c = new Customer("first", "last");
             Assert.assertTrue(c.getId() == 0);
-            dataWiterService.persist(c);
+            c = dataWiterService.persist(c);
             Assert.assertTrue(c.getId() > 0);
 
-            final Merchant m = new Merchant("first", "last");
+            Merchant m = new Merchant("first", "last");
             Assert.assertTrue(m.getId() == 0);
-            dataWiterService.persist(m);
+            m = dataWiterService.persist(m);
             Assert.assertTrue(m.getId() > 0);
         }
 
         for (int i = 1; i <= 100; i++) {
-            final Merchant m = new Merchant("first", "last");
+            Merchant m = new Merchant("first", "last");
             Assert.assertTrue(m.getId() == 0);
-            dataWiterService.persist(m);
+            m = dataWiterService.persist(m);
             Assert.assertTrue(m.getId() > 0);
 
-            final Customer c = new Customer("first", "last");
+            Customer c = new Customer("first", "last");
             Assert.assertTrue(c.getId() == 0);
-            dataWiterService.persist(c);
+            c = dataWiterService.persist(c);
             Assert.assertTrue(c.getId() > 0);
         }
 
     }
 
+    @Test
+    public void test4() {
+        DataWiterService dataWiterService = applicationContext.getBean(DataWiterService.class);
+
+
+        for (int i = 1; i <= 10; i++) {
+            Customer c = new Customer("first", "last");
+            Assert.assertTrue(c.getId() == 0);
+            c = dataWiterService.persist(c);
+            Assert.assertTrue(c.getId() > 0);
+
+            Merchant m = new Merchant("first", "last");
+            Assert.assertTrue(m.getId() == 0);
+            m = dataWiterService.persist(m);
+            m.setFirstName("123");
+            m = dataWiterService.persist(m);
+            Assert.assertTrue(m.getId() > 0);
+        }
+
+
+        final Customer c = dataWiterService.find(Customer.class, 1L);
+        dataWiterService.remove(c);
+    }
 
 }

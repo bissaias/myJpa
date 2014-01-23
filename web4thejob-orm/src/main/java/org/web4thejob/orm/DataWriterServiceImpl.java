@@ -9,6 +9,7 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -28,18 +29,21 @@ public class DataWriterServiceImpl implements DataWiterService {
     ApplicationContext applicationContext;
 
     protected String getPersistenceUnitName(final Entity entity) {
+        return getPersistenceUnitName(entity.getClass());
+    }
 
+    protected <E extends Entity> String getPersistenceUnitName(Class<E> entityClass) {
         for (Map.Entry<String, EntityManagerFactoryInfo> entry :
                 BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext,
                         EntityManagerFactoryInfo.class).entrySet()) {
 
-            if (entry.getValue().getPersistenceUnitInfo().getManagedClassNames().contains(entity.getClass().getName()
+            if (entry.getValue().getPersistenceUnitInfo().getManagedClassNames().contains(entityClass.getName()
             )) {
                 return entry.getValue().getPersistenceUnitInfo().getPersistenceUnitName();
             }
         }
 
-        throw new IllegalArgumentException(entity.toString());
+        throw new IllegalArgumentException(entityClass.toString());
     }
 
 
@@ -54,7 +58,7 @@ public class DataWriterServiceImpl implements DataWiterService {
             }
         }
 
-        return null;
+        throw new IllegalArgumentException(unitName);
     }
 
     protected EntityManager getEntityManager(final String unitName) {
@@ -65,7 +69,37 @@ public class DataWriterServiceImpl implements DataWiterService {
 
 
     @Override
-    public void persist(final Entity entity) {
+    public <E extends Entity> E persist(final E entity) {
+        final String unitName = getPersistenceUnitName(entity);
+        final PlatformTransactionManager platformTransactionManager = getJpaTransactionManager(unitName);
+        final TransactionTemplate transactionTemplate = new TransactionTemplate(platformTransactionManager);
+        return transactionTemplate.execute(new TransactionCallback<E>() {
+            @Override
+            public E doInTransaction(TransactionStatus status) {
+                final EntityManager entityManager = getEntityManager(unitName);
+                E managed = entityManager.merge(entity);
+                entityManager.persist(managed);
+                return managed;
+            }
+        });
+    }
+
+    @Override
+    public <E extends Entity> E find(final Class<E> entityClass, final Object primaryKey) {
+        final String unitName = getPersistenceUnitName(entityClass);
+        final PlatformTransactionManager platformTransactionManager = getJpaTransactionManager(unitName);
+        final TransactionTemplate transactionTemplate = new TransactionTemplate(platformTransactionManager);
+        return transactionTemplate.execute(new TransactionCallback<E>() {
+            @Override
+            public E doInTransaction(TransactionStatus status) {
+                final EntityManager entityManager = getEntityManager(unitName);
+                return entityManager.find(entityClass, primaryKey);
+            }
+        });
+    }
+
+    @Override
+    public void remove(final Entity entity) {
         final String unitName = getPersistenceUnitName(entity);
         final PlatformTransactionManager platformTransactionManager = getJpaTransactionManager(unitName);
         final TransactionTemplate transactionTemplate = new TransactionTemplate(platformTransactionManager);
@@ -73,9 +107,9 @@ public class DataWriterServiceImpl implements DataWiterService {
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus status) {
                 final EntityManager entityManager = getEntityManager(unitName);
-                entityManager.persist(entity);
+                Entity managed = entityManager.merge(entity);
+                entityManager.remove(managed);
             }
         });
-
     }
 }
