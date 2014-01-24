@@ -13,6 +13,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Veniamin Isaias
@@ -96,24 +102,56 @@ public class TestCase {
     public void test4() {
         DataWiterService dataWiterService = applicationContext.getBean(DataWiterService.class);
 
-
-        for (int i = 1; i <= 10; i++) {
-            Customer c = new Customer("first", "last");
-            Assert.assertTrue(c.getId() == 0);
-            c = dataWiterService.persist(c);
-            Assert.assertTrue(c.getId() > 0);
-
-            Merchant m = new Merchant("first", "last");
-            Assert.assertTrue(m.getId() == 0);
-            m = dataWiterService.persist(m);
-            m.setFirstName("123");
-            m = dataWiterService.persist(m);
-            Assert.assertTrue(m.getId() > 0);
-        }
+        Customer c = new Customer("first", "last");
+        Assert.assertTrue(c.getId() == 0);
+        c = dataWiterService.persist(c);
+        Assert.assertTrue(c.getId() > 0);
 
 
-        final Customer c = dataWiterService.find(Customer.class, 1L);
+        Merchant m = new Merchant("first", "last");
+        Assert.assertTrue(m.getId() == 0);
+        m = dataWiterService.persist(m);
+        m.setFirstName("123");
+        m = dataWiterService.persist(m);
+        Assert.assertTrue(m.getId() > 0);
+
+        DataReaderService dataReaderService = applicationContext.getBean(DataReaderService.class);
+        c = dataReaderService.find(Customer.class, c.getId());
         dataWiterService.remove(c);
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void test5() {
+        DataWiterService dataWiterService = applicationContext.getBean(DataWiterService.class);
+
+        Customer c = new Customer("first", "last");
+        PersistenceUtils.getTransactionalEntityManager(c);
+    }
+
+    @Test
+    public void test6() {
+        test3();
+
+        DataReaderService dataReaderService = applicationContext.getBean(DataReaderService.class);
+
+        CriteriaQuery<Customer> cq = dataReaderService.getCriteriaQuery(Customer.class);
+        Root<Customer> root = cq.from(Customer.class);
+
+        List<Customer> customers = dataReaderService.getResultList(cq);
+
+        assertTrue(customers.size() > 0);
+
+    }
+
+    @Test
+    public void test7() {
+        DataWiterService dataWiterService = applicationContext.getBean(DataWiterService.class);
+
+        Customer c1 = new Customer("first", "last");
+        Customer c2 = new Customer("first", "last");
+
+        for (Customer c : dataWiterService.persist(Arrays.asList(c1, c2))) {
+            assertTrue(c.getId() > 0);
+        }
+    }
 }
