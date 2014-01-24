@@ -7,7 +7,7 @@ import java.util.Collection;
  * @since 1.0.0
  */
 
-public interface DataWiterService {
+public interface DataWriterService {
 
     <E extends Entity> E persist(final E entity);
 

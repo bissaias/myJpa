@@ -8,7 +8,6 @@
         <!--<non-jta-data-source>joblet1_DS</non-jta-data-source>-->
         <class>com.joblet.one.Customer</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
-
         <properties>
             <!--
                         <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>

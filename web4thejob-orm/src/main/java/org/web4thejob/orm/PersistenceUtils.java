@@ -21,7 +21,7 @@ public abstract class PersistenceUtils {
         return getPersistenceUnitName(entity.getClass());
     }
 
-    public static <E extends Entity> String getPersistenceUnitName(Class<E> entityClass) {
+    public static String getPersistenceUnitName(Class<? extends Entity> entityClass) {
         for (Map.Entry<String, EntityManagerFactoryInfo> entry :
                 BeanFactoryUtils.beansOfTypeIncludingAncestors(ContextUtils.getRootContext(),
                         EntityManagerFactoryInfo.class).entrySet()) {
@@ -35,6 +35,23 @@ public abstract class PersistenceUtils {
         throw new IllegalArgumentException(entityClass.toString());
     }
 
+    public static EntityManagerFactory getEntityManagerFactory(Entity entity) {
+        return getEntityManagerFactory(entity.getClass());
+    }
+
+    public static EntityManagerFactory getEntityManagerFactory(Class<? extends Entity> entityClass) {
+        for (Map.Entry<String, EntityManagerFactoryInfo> entry :
+                BeanFactoryUtils.beansOfTypeIncludingAncestors(ContextUtils.getRootContext(),
+                        EntityManagerFactoryInfo.class).entrySet()) {
+
+            if (entry.getValue().getPersistenceUnitInfo().getManagedClassNames().contains(entityClass.getName()
+            )) {
+                return entry.getValue().getNativeEntityManagerFactory();
+            }
+        }
+
+        throw new IllegalArgumentException(entityClass.toString());
+    }
 
     public static PlatformTransactionManager getJpaTransactionManager(final Entity entity) {
         return getJpaTransactionManager(getPersistenceUnitName(entity));

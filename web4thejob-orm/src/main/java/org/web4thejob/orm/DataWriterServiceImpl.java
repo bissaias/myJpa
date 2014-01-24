@@ -18,7 +18,7 @@ import java.util.List;
  */
 
 @Repository
-public class DataWriterServiceImpl implements DataWiterService {
+public class DataWriterServiceImpl implements DataWriterService {
 
 
     @Override

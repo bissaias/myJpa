@@ -1,10 +1,9 @@
 package com.joblet.one;
 
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import org.hibernate.validator.constraints.NotBlank;
+
+import javax.persistence.*;
 
 @Entity
 //@Table(schema = "job1")
@@ -38,7 +37,9 @@ public class Customer implements org.web4thejob.orm.Entity {
         this.lastName = lastName;
     }
 
+    @Column(nullable = false)
     private String firstName;
+    @Column(nullable = false) @NotBlank
     private String lastName;
 
     protected Customer() {

@@ -15,6 +15,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import javax.validation.ConstraintViolationException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -69,30 +70,30 @@ public class TestCase {
 
     @Test
     public void test3() {
-        DataWiterService dataWiterService = applicationContext.getBean(DataWiterService.class);
+        DataWriterService dataWriterService = applicationContext.getBean(DataWriterService.class);
 
 
         for (int i = 1; i <= 100; i++) {
             Customer c = new Customer("first", "last");
             Assert.assertTrue(c.getId() == 0);
-            c = dataWiterService.persist(c);
+            c = dataWriterService.persist(c);
             Assert.assertTrue(c.getId() > 0);
 
             Merchant m = new Merchant("first", "last");
             Assert.assertTrue(m.getId() == 0);
-            m = dataWiterService.persist(m);
+            m = dataWriterService.persist(m);
             Assert.assertTrue(m.getId() > 0);
         }
 
         for (int i = 1; i <= 100; i++) {
             Merchant m = new Merchant("first", "last");
             Assert.assertTrue(m.getId() == 0);
-            m = dataWiterService.persist(m);
+            m = dataWriterService.persist(m);
             Assert.assertTrue(m.getId() > 0);
 
             Customer c = new Customer("first", "last");
             Assert.assertTrue(c.getId() == 0);
-            c = dataWiterService.persist(c);
+            c = dataWriterService.persist(c);
             Assert.assertTrue(c.getId() > 0);
         }
 
@@ -100,29 +101,29 @@ public class TestCase {
 
     @Test
     public void test4() {
-        DataWiterService dataWiterService = applicationContext.getBean(DataWiterService.class);
+        DataWriterService dataWriterService = applicationContext.getBean(DataWriterService.class);
 
         Customer c = new Customer("first", "last");
         Assert.assertTrue(c.getId() == 0);
-        c = dataWiterService.persist(c);
+        c = dataWriterService.persist(c);
         Assert.assertTrue(c.getId() > 0);
 
 
         Merchant m = new Merchant("first", "last");
         Assert.assertTrue(m.getId() == 0);
-        m = dataWiterService.persist(m);
+        m = dataWriterService.persist(m);
         m.setFirstName("123");
-        m = dataWiterService.persist(m);
+        m = dataWriterService.persist(m);
         Assert.assertTrue(m.getId() > 0);
 
         DataReaderService dataReaderService = applicationContext.getBean(DataReaderService.class);
         c = dataReaderService.find(Customer.class, c.getId());
-        dataWiterService.remove(c);
+        dataWriterService.remove(c);
     }
 
     @Test(expected = IllegalStateException.class)
     public void test5() {
-        DataWiterService dataWiterService = applicationContext.getBean(DataWiterService.class);
+        DataWriterService dataWriterService = applicationContext.getBean(DataWriterService.class);
 
         Customer c = new Customer("first", "last");
         PersistenceUtils.getTransactionalEntityManager(c);
@@ -145,13 +146,35 @@ public class TestCase {
 
     @Test
     public void test7() {
-        DataWiterService dataWiterService = applicationContext.getBean(DataWiterService.class);
+        DataWriterService dataWriterService = applicationContext.getBean(DataWriterService.class);
 
         Customer c1 = new Customer("first", "last");
         Customer c2 = new Customer("first", "last");
 
-        for (Customer c : dataWiterService.persist(Arrays.asList(c1, c2))) {
+        for (Customer c : dataWriterService.persist(Arrays.asList(c1, c2))) {
             assertTrue(c.getId() > 0);
         }
     }
+
+    @Test(expected = ConstraintViolationException.class)
+    public void test8() {
+        DataWriterService dataWriterService = applicationContext.getBean(DataWriterService.class);
+
+        Customer c = new Customer("first", null);
+        dataWriterService.persist(c);
+    }
+
+    @Test
+    public void test9() {
+        DataWriterService dataWriterService = applicationContext.getBean(DataWriterService.class);
+        Merchant m = new Merchant("first", "last");
+        m = dataWriterService.persist(m);
+
+        DataReaderService dataReaderService = applicationContext.getBean(DataReaderService.class);
+        dataReaderService.find(Merchant.class, m.getId());
+
+        assertTrue(PersistenceUtils.getEntityManagerFactory(m).getCache().contains(Merchant.class, m.getId()));
+
+    }
+
 }

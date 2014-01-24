@@ -1,12 +1,10 @@
 package com.joblet.two;
 
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
+@Cacheable
 //@Table(schema = "job2")
 public class Merchant implements org.web4thejob.orm.Entity {
 
