@@ -9,6 +9,8 @@ import org.web4thejob.context.ContextUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,6 +39,18 @@ public abstract class PersistenceUtils {
 
     public static EntityManagerFactory getEntityManagerFactory(Entity entity) {
         return getEntityManagerFactory(entity.getClass());
+    }
+
+    public static List<EntityManagerFactory> getEntityManagerFactoryList() {
+        List<EntityManagerFactory> factoryList = new ArrayList<>();
+
+        for (Map.Entry<String, EntityManagerFactoryInfo> entry :
+                BeanFactoryUtils.beansOfTypeIncludingAncestors(ContextUtils.getRootContext(),
+                        EntityManagerFactoryInfo.class).entrySet()) {
+            factoryList.add(entry.getValue().getNativeEntityManagerFactory());
+        }
+
+        return factoryList;
     }
 
     public static EntityManagerFactory getEntityManagerFactory(Class<? extends Entity> entityClass) {

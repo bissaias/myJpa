@@ -2,6 +2,7 @@ package org.web4thejob.orm;
 
 import com.joblet.one.Customer;
 import com.joblet.two.Merchant;
+import com.joblet.two.Merchant_;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,13 +14,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.validation.ConstraintViolationException;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Veniamin Isaias
@@ -175,6 +178,45 @@ public class TestCase {
 
         assertTrue(PersistenceUtils.getEntityManagerFactory(m).getCache().contains(Merchant.class, m.getId()));
 
+    }
+
+    @Test
+    public void test10() {
+        DataWriterService dataWriterService = applicationContext.getBean(DataWriterService.class);
+        Merchant m = new Merchant("first", "last");
+        dataWriterService.persist(m);
+        m = new Merchant("first", "last");
+        m = dataWriterService.persist(m);
+
+        DataReaderService dataReaderService = applicationContext.getBean(DataReaderService.class);
+        CriteriaBuilder cb = dataReaderService.getCriteriaBuilder(Merchant.class);
+        CriteriaQuery<Merchant> cq = dataReaderService.getCriteriaQuery(Merchant.class);
+        Root<Merchant> root = cq.from(Merchant.class);
+        Predicate condition1 = cb.equal(root.get(Merchant_.id), m.getId());
+        Predicate condition2 = cb.equal(root.get(Merchant_.firstName), m.getFirstName());
+        cq.where(cb.and(condition1, condition2));
+
+        assertNotNull(dataReaderService.getSingleResult(cq));
+
+    }
+
+    @Test
+    public void test11() {
+        DataWriterService dataWriterService = applicationContext.getBean(DataWriterService.class);
+        Merchant m = new Merchant("first", "last");
+        dataWriterService.persist(m);
+        m = new Merchant("first", "last");
+        m = dataWriterService.persist(m);
+
+        DataReaderService dataReaderService = applicationContext.getBean(DataReaderService.class);
+        CriteriaBuilder cb = dataReaderService.getCriteriaBuilder(Merchant.class);
+        CriteriaQuery<Merchant> cq = dataReaderService.getCriteriaQuery(Merchant.class);
+        Root<Merchant> root = cq.from(Merchant.class);
+        Predicate condition1 = cb.equal(root.get(Merchant_.id), m.getId());
+        Predicate condition2 = cb.equal(root.get(Merchant_.firstName), "xxxxx-xxxx-xxxx");
+        cq.where(cb.and(condition1, condition2));
+
+        assertNull(dataReaderService.getSingleOrNoResult(cq));
     }
 
 }
